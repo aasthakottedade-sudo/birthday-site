@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>For You 💫</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --card: #101827;
+      --accent: #fbbf24;
+      --accent-soft: #fed7aa;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
+      color: var(--text);
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 450px;
+      padding: 16px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, #020617, #020617 40%, #0b1120);
+      border-radius: 20px;
+      padding: 28px 22px 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1, h2, h3 {
+      font-weight: 600;
+    }
+
+    .title {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .field {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: rgba(15,23,42,0.85);
+      color: var(--text);
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #f97316, #facc15);
+      color: #111827;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 8px 20px rgba(248, 181, 55, 0.5);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(248, 181, 55, 0.7);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .error {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #fca5a5;
+      min-height: 1em;
+    }
+
+    #mainScreen, #musicScreen {
+      display: none;
+      text-align: center;
+    }
+
+    .hb-title {
+      font-size: 1.9rem;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    .hb-sub {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .gift-container {
+      margin: 10px auto 16px;
+      width: 140px;
+      height: 140px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .gift-box,
+    .gift-lid {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 12px;
+    }
+
+    .gift-box {
+      bottom: 0;
+      width: 120px;
+      height: 85px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.6);
+    }
+
+    .gift-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin: 0 auto;
+      width: 24px;
+      background: rgba(249, 250, 251, 0.8);
+    }
+
+    .gift-lid {
+      bottom: 78px;
+      width: 130px;
+      height: 30px;
+      background: linear-gradient(135deg, #facc15, #f97316);
+      transform-origin: bottom center;
+      transition: transform 0.4s ease, bottom 0.4s ease;
+    }
+
+    .gift-lid::before,
+    .gift-lid::after {
+      content: "";
+      position: absolute;
+      top: -16px;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 3px solid rgba(249,250,251,0.9);
+    }
+
+    .gift-lid::before { left: 34%; }
+    .gift-lid::after { right: 34%; }
+
+    .gift-container.open .gift-lid {
+      bottom: 115px;
+      transform: translateX(-50%) rotateX(55deg);
+    }
+
+    .gift-label {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .letter {
+      margin-top: 18px;
+      padding: 14px 14px 16px;
+      border-radius: 16px;
+      background: rgba(15,23,42,0.92);
+      border: 1px solid rgba(148,163,184,0.45);
+      text-align: left;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.45s ease, opacity 0.45s ease, margin-top 0.2s ease;
+    }
+
+    .letter.visible {
+      max-height: 1600px;
+      opacity: 1;
+    }
+
+    .letter strong {
+      color: var(--accent-soft);
+    }
+
+    .video-block {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(148,163,184,0.3);
+    }
+
+    .video-wrapper {
+      margin-top: 6px;
+      width: 100%;
+      max-width: 340px;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-caption {
+      font-size: 0.82rem;
+      color: #fef9c3;
+      margin-top: 6px;
+    }
+
+    .playlist-button {
+      margin-top: 16px;
+    }
+
+    .songs-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 420px) {
+      .photo-grid {
+        grid-template-columns: repeat(3, minmax(0,1fr));
+      }
+    }
+
+    .photo-card {
+      background: radial-gradient(circle at top left,#facc15,#f97316);
+      border-radius: 16px;
+      padding: 6px;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .photo-card img {
+      width: 100%;
+      border-radius: 12px;
+      display: block;
+    }
+
+    .photo-caption {
+      font-size: 0.8rem;
+      color: #111827;
+      text-align: center;
+    }
+
+    .song-player-wrapper {
+      margin-top: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: rgba(15,23,42,0.9);
+      padding: 10px 10px 8px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .song-player-wrapper.active {
+      display: flex;
+    }
+
+    .song-player-caption {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    audio {
+      width: 100%;
+      outline: none;
+    }
+
+    .back-btn {
+      margin-bottom: 10px;
+      padding-inline: 14px;
+      font-size: 0.85rem;
+    }
+
+    .music-title {
+      font-size: 1.3rem;
+      margin-bottom: 6px;
+    }
+
+    .music-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .confetti {
+      position: fixed;
+      top: -10px;
+      width: 8px;
+      height: 14px;
+      border-radius: 999px;
+      opacity: 0.9;
+      animation: fall 2.4s linear forwards;
+      z-index: 999;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-10px) rotateZ(0deg); }
+      100% { transform: translateY(110vh) rotateZ(360deg); }
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(18px);
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    .orb.one {
+      width: 140px;
+      height: 140px;
+      background: #f97316;
+      top: -40px;
+      right: -40px;
+    }
+
+    .orb.two {
+      width: 120px;
+      height: 120px;
+      background: #22c55e;
+      bottom: -50px;
+      left: -30px;
+    }
+
+    .orb.three {
+      width: 90px;
+      height: 90px;
+      background: #3b82f6;
+      bottom: 10px;
+      right: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 22px 18px 20px; }
+      .hb-title { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- LOCK SCREEN -->
+    <div class="card" id="lockScreen">
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+      <div class="orb three"></div>
+
+      <h1 class="title">Unlock us 🔐</h1>
+      <p class="subtitle">
+        To unlock this page, answer this one question:<br/>
+        <strong>What’s my nickname for you?</strong>
+      </p>
+
+      <div class="field">
+        <input id="answerInput" type="text" placeholder="Type it here..." />
+        <button id="unlockBtn">Unlock</button>
+      </div>
+      <div class="hint">
+        Tiny hint: think of a fruit name. 
+      </div>
+      <div class="error" id="errorMsg"></div>
+    </div>
+
+    <!-- MAIN SCREEN (LETTER + VIDEO) -->
+    <div class="card" id="mainScreen">
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+      <div class="orb three"></div>
+
+      <h1 class="hb-title">Happy Birthday ❤️</h1>
+      <p class="hb-sub">
+        You don’t like birthdays. I don’t care. I like <em>you</em>.
+      </p>
+
+      <div class="gift-container" id="giftBox">
+        <div class="gift-lid"></div>
+        <div class="gift-box"></div>
+      </div>
+      <div class="gift-label">Tap the gift to open your letter.</div>
+
+      <div class="letter" id="letter">
+        <p><strong>Hi Puchakaay,</strong></p>
+        <p>
+          It all started with admiration. I looked at you and thought,
+          “How can one person be this driven, this focused, this annoying
+          and still so lovable?” I kept telling myself I was just inspired
+          by you, just motivated by you… that maybe that’s why I was so
+          drawn to you.
+        </p>
+        <p>
+          But if I’m honest, it’s more than that. It’s the spark.
+          The stupid chemistry between us that I can’t explain.
+          Right from the start I just wanted to be around you,
+          to know you more and more, to see every version of you –
+          the serious one, the lazy one, the “I don’t care” one,
+          and the secretly soft one.
+        </p>
+        <p>
+          You always ask me, “Have you ever thought about our future?”
+          I have. From the very beginning. I see us under the same roof,
+          travelling, cuddling, loving, going to the gym together,
+          doing crazy adventures, partying, fighting and still choosing
+          each other, building a home together in our own messy way.
+        </p>
+        <p>
+          I miss you so much right now. Distance sucks, but you don’t.
+          And as much as you pretend you don’t care about birthdays,
+          I care about you – loudly, stubbornly, completely.
+        </p>
+        <p>
+          I love you. More than yesterday, less than tomorrow. 💛
+        </p>
+
+        <!-- VIDEO SECTION -->
+        <div class="video-block">
+          <p style="margin-bottom: 4px; color: #fbbf24;">
+            And this… this is exactly how I feel about us:
+          </p>
+          <div class="video-wrapper">
+            <!-- Lauv - I Like Me Better -->
+            <iframe
+              src="https://www.youtube.com/embed/BcqxLCWn-CE "
+              title="Lauv - I Like Me Better"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <p class="video-caption">
+            Lauv – “I Like Me Better”<br>
+            Because I like me better when I’m with you… and I want us to be like this.
+          </p>
+        </div>
+
+        <div class="playlist-button">
+          <button id="openPlaylistBtn">Open little playlist →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MUSIC SCREEN (SECOND PAGE) -->
+    <div class="card" id="musicScreen">
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+      <div class="orb three"></div>
+
+      <button class="back-btn" id="backBtn">← Back to letter</button>
+
+      <h1 class="music-title">little playlist</h1>
+      <p class="music-sub">
+        Three moods, three songs, three tiny pieces of us.
+      </p>
+
+      <p class="songs-note">
+        Tap a photo to play the song that matches that feeling.
+      </p>
+
+      <div class="photo-grid">
+        <div class="photo-card"
+             data-audio="wieschoen.mp3"
+             data-title="Wie schön du bist">
+          <img src="wieschoen.jpg" alt="Wie schön du bist" />
+          <div class="photo-caption">
+            Wie schön du bist<br>
+            <span style="font-size:0.75rem;">You don’t realise how much I admire you…
+but this song explains it better than I ever can</span>
+          </div>
+        </div>
+
+        <div class="photo-card"
+             data-audio="rangamma.mp3"
+             data-title="Rangamma Mangamma">
+          <img src="rangamma.jpg" alt="Rangamma Mangamma" />
+          <div class="photo-caption">
+            Rangamma Mangamma<br>
+            <span style="font-size:0.75rem;">when you act like you don’t care </span>
+          </div>
+        </div>
+
+        <div class="photo-card"
+             data-audio="dooram.mp3"
+             data-title="Dooram">
+          <img src="dooram.jpg" alt="Dooram" />
+          <div class="photo-caption">
+            Dooram<br>
+            <span style="font-size:0.75rem;">what I’m feeling about us right now</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="song-player-wrapper" id="songPlayerWrapper">
+        <div class="song-player-caption">
+          Now playing: <span id="nowPlayingTitle">—</span>
+        </div>
+        <audio id="songPlayer" controls></audio>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // all acceptable nicknames (lowercase)
+    const SECRET_NICKNAMES = ["puchakaay", "puchakay", "puchakayi", "watermelon"];
+
+    const lockScreen = document.getElementById("lockScreen");
+    const mainScreen = document.getElementById("mainScreen");
+    const musicScreen = document.getElementById("musicScreen");
+    const answerInput = document.getElementById("answerInput");
+    const unlockBtn = document.getElementById("unlockBtn");
+    const errorMsg = document.getElementById("errorMsg");
+    const giftBox = document.getElementById("giftBox");
+    const letter = document.getElementById("letter");
+    const openPlaylistBtn = document.getElementById("openPlaylistBtn");
+    const backBtn = document.getElementById("backBtn");
+    const photoCards = document.querySelectorAll(".photo-card");
+    const songPlayer = document.getElementById("songPlayer");
+    const songPlayerWrapper = document.getElementById("songPlayerWrapper");
+    const nowPlayingTitle = document.getElementById("nowPlayingTitle");
+
+    function normalise(str) {
+      return str.toLowerCase().trim();
+    }
+
+    function isCorrectNickname(ans) {
+      const n = normalise(ans);
+      return SECRET_NICKNAMES.includes(n);
+    }
+
+    function launchConfetti() {
+      const colors = ["#f97316", "#facc15", "#22c55e", "#3b82f6", "#ec4899"];
+      for (let i = 0; i < 90; i++) {
+        const c = document.createElement("div");
+        c.className = "confetti";
+        c.style.left = Math.random() * 100 + "vw";
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.animationDelay = (Math.random() * 0.8) + "s";
+        c.style.opacity = (0.6 + Math.random() * 0.4).toString();
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 2600);
+      }
+    }
+
+    unlockBtn.addEventListener("click", () => {
+      const ans = answerInput.value;
+
+      if (!ans.trim()) {
+        errorMsg.textContent = "At least try something. 😌";
+        return;
+      }
+
+      if (isCorrectNickname(ans)) {
+        errorMsg.textContent = "";
+        lockScreen.style.display = "none";
+        mainScreen.style.display = "block";
+        launchConfetti();
+      } else {
+        errorMsg.textContent = "Nope. That’s not what I call you, puchakaay. 😏";
+      }
+    });
+
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        unlockBtn.click();
+      }
+    });
+
+    giftBox.addEventListener("click", () => {
+      giftBox.classList.add("open");
+      letter.classList.add("visible");
+    });
+
+    openPlaylistBtn.addEventListener("click", () => {
+      mainScreen.style.display = "none";
+      musicScreen.style.display = "block";
+      songPlayer.pause();
+    });
+
+    backBtn.addEventListener("click", () => {
+      musicScreen.style.display = "none";
+      mainScreen.style.display = "block";
+      songPlayer.pause();
+    });
+
+    photoCards.forEach(card => {
+      card.addEventListener("click", () => {
+        const audioFile = card.getAttribute("data-audio");
+        const title = card.getAttribute("data-title") || "Song";
+
+        if (audioFile) {
+          songPlayer.src = audioFile;
+          nowPlayingTitle.textContent = title;
+          songPlayerWrapper.classList.add("active");
+          songPlayer.play().catch(() => {});
+        }
+      });
+    });
+  </script>
+</body>
+</html>
